@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import {
   CustomerField,
   Customer,
@@ -247,10 +247,10 @@ export async function fetchInvoicesPages(query: string) {
 export async function fetchInvoiceById(id: string) {
   try {
     await client.connect();
-    const db = client.db('dashboard'); // Replace with your database name
-    const invoicesCollection = db.collection('invoices');
+    const db = client.db('Dashboard'); // Replace with your database name
+    const invoicesCollection = db.collection<Invoice>('invoices');
 
-    const invoice = await invoicesCollection.findOne({ id });
+    const invoice = await invoicesCollection.findOne(new ObjectId(id));
 
     if (invoice) {
       invoice.amount = invoice.amount / 100; // Convert amount from cents to dollars
@@ -265,15 +265,20 @@ export async function fetchInvoiceById(id: string) {
   }
 }
 
-export async function fetchCustomers() {
+export async function fetchCustomers(): Promise<Customer[]> {
   try {
     await client.connect();
-    const db = client.db('dashboard'); // Replace with your database name
+    const db = client.db('Dashboard'); // Replace with your database name
     const customersCollection = db.collection('customers');
 
     const customers = await customersCollection.find().sort({ name: 1 }).project({ id: 1, name: 1 }).toArray();
-
-    return customers;
+    const customerData: Customer[] = customers.map(item => ({
+      id: item.id,
+      name: item.name,
+      email: item.email,
+      image_url: item.image_url,
+    }));
+    return customerData;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch all customers.');
@@ -285,7 +290,7 @@ export async function fetchCustomers() {
 export async function fetchFilteredCustomers(query: string) {
   try {
     await client.connect();
-    const db = client.db('dashboard'); // Replace with your database name
+    const db = client.db('Dashboard'); // Replace with your database name
     const customersCollection = db.collection('customers');
     const invoicesCollection = db.collection('invoices');
 
