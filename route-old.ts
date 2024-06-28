@@ -2,6 +2,12 @@ import bcrypt from 'bcrypt';
 import { db } from '@vercel/postgres';
 import { invoices, customers, revenue, users } from './app/lib/placeholder-data';
 
+/**
+  * OLD DB SEED FILE
+  * OPTED FOR MONGODB CONNECTION
+  * REWROTE ALL FUNCTIONS TO REFLECT MONGODB
+ */
+
 const client = await db.connect();
 
 async function seedUsers() {
