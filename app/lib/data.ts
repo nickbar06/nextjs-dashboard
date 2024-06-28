@@ -259,7 +259,6 @@ export async function fetchInvoiceById(id: string) {
     return invoice;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoice.');
   } finally {
     // await client.close();
   }
