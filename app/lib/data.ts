@@ -1,4 +1,3 @@
-// import { sql } from '@vercel/postgres';
 import { MongoClient } from 'mongodb';
 import {
   CustomerField,
@@ -208,7 +207,7 @@ export async function fetchFilteredInvoices(
 export async function fetchInvoicesPages(query: string) {
   try {
     await client.connect();
-    const db = client.db('dashboard'); // Replace with your database name
+    const db = client.db('Dashboard'); // Replace with your database name
     const invoicesCollection = db.collection('invoices');
     const customersCollection = db.collection('customers');
 
