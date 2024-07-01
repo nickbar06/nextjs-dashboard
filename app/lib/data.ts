@@ -21,7 +21,6 @@ export async function fetchRevenue(): Promise<Revenue[]> {
 
     const revenueCollection = db.collection('revenue');
 
-    console.log('Fetching revenue data...');
     await new Promise((resolve) => setTimeout(resolve, 3000));
     const data = await revenueCollection.find({}, { projection: { _id: 0, month: 1, revenue: 1 } }).toArray();
 

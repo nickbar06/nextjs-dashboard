@@ -5,6 +5,10 @@ import { MongoClient, ObjectId } from 'mongodb';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+import { signIn, signOut } from '@/auth';
+import { AuthError } from 'next-auth';
+import { cookies } from 'next/headers';
+
 const client = new MongoClient('mongodb://localhost:27017'); // Replace with your MongoDB URI
 
 const FormSchema = z.object({
@@ -59,6 +63,8 @@ export async function updateInvoice(id: string, formData: FormData) {
 
         const invoicesCollection = db.collection('invoices');
         await invoicesCollection.updateOne(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             { "_id": id },
             { $set: { customer_id: customer_id, amount: amountInCents, status: status } }
         );
@@ -84,6 +90,25 @@ export async function deleteInvoice(id: string) {
         console.log(resp)
         revalidatePath('/dashboard/invoices');
     } catch (error) {
+        throw error;
+    }
+}
+
+export async function authenticate(
+    prevState: string | undefined,
+    formData: FormData,
+) {
+    try {
+        await signIn('credentials', formData);
+    } catch (error) {
+        if (error instanceof AuthError) {
+            switch (error.type) {
+                case 'CredentialsSignin':
+                    return 'Invalid credentials.';
+                default:
+                    return 'Something went wrong.';
+            }
+        }
         throw error;
     }
 }
